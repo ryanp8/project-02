@@ -12,15 +12,16 @@ int main(int argc, char *argv[]) {
 		char *content = calloc(fs, sizeof(char));
 		int x = WINDOW_X;
 		int y = WINDOW_Y;
+		int max_x, max_y;
+		int top_row = 0;
 
 		initscr();
         WINDOW *editor = open_editor(argv[1]);
+		getmaxyx(editor, max_y, max_x);
 
 		int c;
 		while (running) {
-			content = read_input(editor, content, &fs, &x, &y);
-			// display_content(editor, content, fs);
-			// print_content(editor, fs);
+			content = read_input(editor, content, &fs, &x, &y, &top_row, max_x, max_y);
 		}
 
 		endwin();
