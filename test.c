@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <sys/shm.h>
+#include <sys/ipc.h>
+#include <sys/types.h>
+
+#define READ 0
+#define WRITE 1
 
 void printc(char *c, int fs) {
     printf("[");
@@ -51,12 +61,84 @@ int line_len(char *content, int y) {
     return second - first;
 }
 
+char **split(char *input, char *tok) {
+    int tok_count = strcount(input, tok[0]);
+    char **parsed = calloc(tok_count + 2, sizeof(char*));
+    int i = 0;
+    while(input) {
+        parsed[i] = strsep(&input, tok);
+        if (input) {
+            input += strlen(tok) - 1;
+        }
+        i++;
+    }
+    return parsed;
+}
 
-int main() {
+int run_command(char *command, char *output) {
 
-    char* s = calloc(7, 1);
+    char **parsed = split(command, " ");
+    int stdout_dup = dup(STDOUT_FILENO);
 
-    strcpy(s, "hello");
+    int f = fork();
+    if (f) {
+        int w, status;
+        w = waitpid(f, &status, 0);
+        printf("PARENT ENDED\n");
+    }
+    else {
+        int fds[2];
+        pipe(fds);
+        int f2 = fork();
+        if (f2) {
+            int w, status;
+            w = waitpid(f2, &status, 0);
+            close(fds[WRITE]);
+            read(fds[READ], output, 1024);
+            kill(getpid(), 2);
+        }
+        else {
+            close(fds[READ]);
+            dup2(fds[WRITE], STDOUT_FILENO);
+            int res = execvp(parsed[0], parsed);
+        }
+    }
+    dup2(stdout_dup, STDOUT_FILENO);
+    
+    return 0;
+}
+
+
+
+
+
+int main(int argc, char* argv[]) {
+
+    if (argc > 1) {
+        // char *output;
+        // int shmd;
+        // shmd = shmget(24602, 1024, IPC_CREAT | 0640);
+        // output = shmat(shmd, 0, 0);
+
+        // // output = shmget(24602, 0, 0);
+        // run_command(argv[1], output);
+
+        // int fd = open("test.txt", O_WRONLY | O_TRUNC | O_CREAT, 0644);
+        // write(fd, output, 1024);
+        // printf("[%s], %d\n", output, getpid());
+        // shmdt(output);
+        // shmctl(shmd, IPC_RMID, 0); 
+        char *content = malloc(100);
+        int fs = 20;
+        int fd = open(argv[1], O_RDONLY);
+        read(fd, content, fs);
+        printf("[%s]\n", content);
+    }
+
+
+    // char* s = calloc(7, 1);
+
+    // strcpy(s, "hello");
 
     // int i;
     // for (i = 8; i > 3; i--) {
@@ -72,7 +154,7 @@ int main() {
     // printf("%d\n", strcount("aaa", 'a'));
 
     // printf("%d\n", line_len("hello\ngoodbye\nhello again", 0));
-    printf("%d\n", line_len("hello\nab", 2));
+    // printf("%d\n", line_len("hello\nab", 2));
 
     
     // char *a = "int i = 10;\nint j = 20;\nhello";

@@ -1,5 +1,5 @@
-all: main.o editor.o
-	gcc -o editor main.o editor.o -lncurses
+all: main.o editor.o console.o
+	gcc -o editor main.o editor.o console.o -lncurses
 
 main.o: main.c editor.h
 	gcc -c main.c
@@ -7,10 +7,13 @@ main.o: main.c editor.h
 editor.o: editor.c editor.h
 	gcc -c editor.c
 
+console.o: console.c console.h
+	gcc -c console.c
+
 clean:
 	rm *.o
 	rm editor
 
 run:
 	make
-	./editor test.txt
+	./editor test2.c
