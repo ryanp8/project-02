@@ -5,9 +5,20 @@
 #define CONSOLE 1
 #define CONSOLE_OUTPUT 2
 
+
+static void sighandler(int signo) {
+	if (signo == SIGINT) {
+		endwin();
+		exit(0);
+	}
+}
+
+
 int main(int argc, char *argv[]) {
 
     if (argc > 1) {
+
+		signal(SIGINT, sighandler);
 
 		off_t fs = 1; // start at 1 so there's trailing 0;
 		off_t console_len = 1;
@@ -102,10 +113,11 @@ int main(int argc, char *argv[]) {
 						console_y = 0;
 					}
 
-					draw_text(console_output, output, 0, 0, strlen(output));
+					outplen = strlen(output);
+					draw_text(console_output, output, 0, 0, outplen);
 
 					mvwaddstr(console, 0, 0, ">>>");
-					wrefresh(console);
+					// wrefresh(console);
 
 					wmove(console_output, 0, WINDOW_X);
 					wrefresh(console_output);

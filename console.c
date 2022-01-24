@@ -27,6 +27,15 @@ int run_command(char *command, char *output, char *content, char *filename, int 
         write(fd, content, fs - 1);
         strcpy(output, "changes written!\n");
     }
+    else if (strcmp(command, "quit") == 0) {
+        kill(getpid(), 2);
+    }
+    else if (strcmp(command, "wq") == 0) {
+        int fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+        write(fd, content, fs - 1);
+        strcpy(output, "changes written!\n");
+        kill(getpid(), 2);
+    }
     else {
         char *tmp = malloc(OUTPUT_LEN);
         strcpy(tmp, command);
