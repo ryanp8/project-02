@@ -7,8 +7,6 @@
 
 int main(int argc, char *argv[]) {
 
-	int mode = EDIT;
-    
     if (argc > 1) {
 
 		off_t fs = 1; // start at 1 so there's trailing 0;
@@ -48,10 +46,10 @@ int main(int argc, char *argv[]) {
 			int fd = open(argv[1], O_RDONLY);
 			read(fd, content, fs);
 			draw_text(editor, content, 0, 0, fs);
-			draw_border(editor);
-			draw_line_nums(editor, editor_max_y, editor_top_row);
-			wmove(editor, 0, WINDOW_X);
 		}
+		draw_border(editor);
+		draw_line_nums(editor, editor_max_y, editor_top_row);
+		wrefresh(editor);
 
 		WINDOW *console = open_console(editor_max_y);
 		getmaxyx(console, console_max_y, console_max_x);
@@ -67,6 +65,8 @@ int main(int argc, char *argv[]) {
 		int outmaxx, outmaxy;
 		getmaxyx(console_output, outmaxy, outmaxx);
 
+		int mode = EDIT;
+		wmove(editor, y, x + WINDOW_X);
 
 		int c;
 		while (1) {
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 				draw_line_nums(editor, editor_max_y, editor_top_row);
 				wmove(editor, y, x + WINDOW_X);
 			}
-			if (mode == CONSOLE) {
+			else if (mode == CONSOLE) {
 
 				wmove(console, console_y, console_x + WINDOW_X);
 				c = read_input(console, &console_input, &mode, &console_input_len, &console_x, &console_y, &console_top_row, console_max_x, console_max_y);
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 					wrefresh(console);
 				}
 			}
-			if (mode == CONSOLE_OUTPUT) {
+			else if (mode == CONSOLE_OUTPUT) {
 				c = wgetch(console_output);
 				handle_navigation(console_output, output, &outtr, c, &outx, &outy, outplen, outmaxy);
 				if (c == 27) {
