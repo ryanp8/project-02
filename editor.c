@@ -99,7 +99,6 @@ char read_input(WINDOW *win, char **content_addr, int *mode, off_t *fs, int *x, 
             case KEY_F0:
             case KEY_BACKSPACE:
             case 127:
-            case KEY_DL:
             case '\b':
                 pos = char_instance(content, '\n', *y + *top_row) + *x + 1;
                 if (pos > 0) {
