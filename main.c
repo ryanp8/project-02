@@ -117,11 +117,17 @@ int main(int argc, char *argv[]) {
 			else if (mode == CONSOLE_OUTPUT) {
 				c = wgetch(console_output);
 				handle_navigation(console_output, output, &outtr, c, &outx, &outy, outplen, outmaxy);
-				if (c == 27) {
-					mode = EDIT;
-				}
-				if (c == '\n') {
-					mode = EDIT;
+				switch(c) {
+					case 27:
+					case '\n':
+						mode = EDIT;
+						break;
+					case KEY_F0:
+					case KEY_BACKSPACE:
+					case 127:
+					case KEY_DL:
+					case '\b':
+						mode = CONSOLE;
 				}
 			}
 		}
