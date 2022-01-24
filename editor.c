@@ -212,7 +212,7 @@ void add_char(char **content, char c, off_t *fs, int x, int y) {
 void draw_line_nums(WINDOW *win, int height, int top_row) {
     int i;
     for (i = 0; i < height - 1; i++) {
-        mvwprintw(win, i, 0, "%d", top_row + i);
+        mvwprintw(win, i, 0, "%d", top_row + i + 1);
     }
 }
 

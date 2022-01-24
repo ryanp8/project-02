@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 		noecho();
 		cbreak();
 		getmaxyx(stdscr, term_y, term_x);
+
         WINDOW *editor = open_editor(argv[1], &fs, content, (int) (term_y * 0.7));
 		getmaxyx(editor, editor_max_y, editor_max_x);
 		if (fs > 1) {
@@ -86,7 +87,7 @@ int main(int argc, char *argv[]) {
 				c = read_input(console, &console_input, &mode, &console_input_len, &console_x, &console_y, &console_top_row, console_max_x, console_max_y);
 
 				if (c == 27) {
-					mode = CONSOLE_OUTPUT;
+					mode = EDIT;
 				}
 				else if (c == '\n') {
 					console_x = strlen(console_input) - 1;
