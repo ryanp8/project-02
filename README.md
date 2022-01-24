@@ -22,6 +22,7 @@ Running the command will move the cursor the the command output section of the e
 * Info about files
 * Processes
 * Unnamed pipes
+* signals
 
 ### Planned additions
 * delete key support in addition to backspace
