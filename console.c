@@ -37,8 +37,6 @@ int run_command(char *command, char *output, char *content, char *filename, int 
         pipe(fds);
         int f = fork();
         if (f) {
-            // int w, status;
-            // w = waitpid(f, &status, 0);
             close(fds[WRITE]);
             read(fds[READ], output, OUTPUT_LEN);
         }
