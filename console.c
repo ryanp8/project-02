@@ -6,6 +6,12 @@ WINDOW *open_console(int start_y) {
     return win;
 }
 
+WINDOW *open_output(int start_y) {
+    WINDOW *win = newwin(0, 0, start_y, 0);
+    keypad(win, TRUE);
+    return win;
+}
+
 char *read_console_input(WINDOW *win, char *input, int *mode, int* console_y) {
     echo();
     char *buf = malloc(1024);
@@ -16,48 +22,38 @@ char *read_console_input(WINDOW *win, char *input, int *mode, int* console_y) {
 
 int run_command(char *command, char *output, char *content, char *filename, int fs) {
 
-    if (strcmp(command, "w") == 0) {
+    if (strcmp(command, "write") == 0) {
         int fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
         write(fd, content, fs - 1);
-    }
-    else if (strcmp(command, "q") == 0) {
-        exit(0);
-    }
-    else if (strcmp(command, "wq") == 0) {
-        int fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-        write(fd, content, fs - 1);
-        endwin();
-        exit(0);
+        strcpy(output, "changes written!\n");
     }
     else {
-        char **parsed = split(command, " ");
+        char *tmp = malloc(OUTPUT_LEN);
+        strcpy(tmp, command);
+        char **parsed = split(tmp, " ");
         int stdout_dup = dup(STDOUT_FILENO);
 
+        int fds[2];
+        pipe(fds);
         int f = fork();
         if (f) {
-            int w, status;
-            w = waitpid(f, &status, 0);
+            // int w, status;
+            // w = waitpid(f, &status, 0);
+            close(fds[WRITE]);
+            read(fds[READ], output, OUTPUT_LEN);
         }
         else {
-            int fds[2];
-            pipe(fds);
-            int f2 = fork();
-            if (f2) {
-                int w, status;
-                w = waitpid(f2, &status, 0);
-                close(fds[WRITE]);
-                read(fds[READ], output, 1024);
-            }
-            else {
-                close(fds[READ]);
-                dup2(fds[WRITE], STDOUT_FILENO);
-                int res = execvp(parsed[0], parsed);
-            }
+            close(fds[READ]);
+            dup2(fds[WRITE], STDOUT_FILENO);
+            int res = execvp(parsed[0], parsed);
         }
         dup2(stdout_dup, STDOUT_FILENO);
-    }
 
-    
+        if (strlen(output) < 1) {
+            strcpy(output, "command not found!\n");
+            return -1;
+        }
+    }
     
     return 0;
 }
@@ -75,3 +71,5 @@ char **split(char *input, char *tok) {
     }
     return parsed;
 }
+
+

@@ -43,7 +43,7 @@ int handle_navigation(WINDOW *win, char *content, int *top_row, int c, int *x, i
             if (*y == 0 && *top_row > 0) {
                 (*top_row)--;
                 draw_text(win, content, char_instance(content, '\n', *top_row) + 1, *top_row, fs);
-                wmove(win, WINDOW_Y, *x);
+                wmove(win, WINDOW_Y, *x + WINDOW_X);
             }
             else if (*y > WINDOW_Y) {
                 (*y)--;

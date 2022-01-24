@@ -12,8 +12,8 @@ console.o: console.c console.h
 
 clean:
 	rm *.o
-	rm editor
+	rm editor console main 
 
 run:
 	make
-	./editor test2.c
+	./editor test.c

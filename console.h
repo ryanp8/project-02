@@ -21,6 +21,7 @@
 #define OUTPUT_LEN 1024
 
 WINDOW *open_console(int start_y);
+WINDOW *open_output(int start_y);
 char *read_console_input(WINDOW *win, char *input, int *mode, int *console_y);
 int run_command(char *command, char *output, char *content, char *filename, int fs);
 char **split(char *input, char *tok);
